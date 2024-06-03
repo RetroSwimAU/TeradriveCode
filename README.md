@@ -22,7 +22,7 @@ Should just need to clone and `wmake` in this directory.
   * https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-06-01-Build
 
 # PC IO writes from MD side
-Download MD Studio, open the file, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.
+Download MD Studio, open `hello_world_with_PC_IO_write.s`, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.
 
 ## Issues
 * Needs an ISA POST analyser card listening on port 0x80 installed.
@@ -32,3 +32,4 @@ Download MD Studio, open the file, and build. Put resulting BIN file on EverDriv
 * MD Studio was used to build 68K ASM into a bootable Mega Drive BIN file
   * https://github.com/gouky/MDStudio
   * Credit: gouky
+* Source is from https://github.com/BigEvilCorporation/megadrive_samples but with my line added.
