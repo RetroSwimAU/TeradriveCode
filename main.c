@@ -116,10 +116,10 @@ int main(void)
                 _dos_read(handle, buffer, 1, &lenRead); // Skip following byte
             }
 
-            if(thisChar == 0x50){
+            if(thisChar == 0x50){ // Next byte is the value to write to the PSG
                 _dos_read(handle, buffer, 1, &lenRead);
                 valueChar = buffer[0];
-                *(psg_memory) = valueChar;
+                *(psg_memory) = valueChar; // Pop
             }
 
             if(thisChar == 0x61){
