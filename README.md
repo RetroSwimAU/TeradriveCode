@@ -26,8 +26,8 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
       * M68K "base address low" bits 13-19 = `(0x5A5A5A & 0x0FE000) >> 12 = 0xA4`
       * M68K "offset" bits 0-12 = `(0x5A5A5A & 0x001FFF) = 0x1A5A`
     * Port writes:
-      * Port `0x1167`, write "base address high"
-      * Port `0x1166`, write "base address low"
+      * Port `0x1167`, write `0x05`
+      * Port `0x1166`, write `0xA4`
     * Then finally:
       * PC address `CE00:1A5A`
   * This is how I access the PSG memory location for my demo.
