@@ -238,8 +238,6 @@ CharacterD:
 
 CPU_EntryPoint
 
-	; This writes 'HELLO WORLD' to the Sega VDP.
-
 	jsr VDP_WriteTMSS
 	jsr VDP_LoadRegisters
 	
@@ -283,8 +281,6 @@ CPU_EntryPoint
 	StatusWrite 0xAA
 	move.b #0x83,0x00AF1164
 	StatusWrite 0xBB
-
- 	; This writes some demo text into PC Video RAM at $B800:0000 ($BB8000 in MD space)
 	
 	move.w #0x579E, 0x00BB8000
 	move.w #0x729E, 0x00BB8002
@@ -345,14 +341,12 @@ CPU_EntryPoint
 	andi.b	#$30,d1		; d1 = 00SA0000
 	lsl.b	#2,d1		; d1 = SA000000
 	or.b	d1,d0		; d0 = SACBRLDU
-
- 	; Press C to switch to PC display
+	
 	move.b  #$20,d2 ; C test
 	and.b	d0, d2
 	tst.b   d2
 	beq.b   CPress
-
- 	; Press B to switch to MD display
+	
 	move.b  #$10,d2 ; B test
 	and.b	d0, d2
 	tst.b   d2
@@ -363,12 +357,31 @@ CPU_EntryPoint
   CPress:
     
     move.b #0x83,0x00AF1164
+    jsr Beep
     jmp CtrlLoop
 	
   BPress:
   
     move.b #0x87,0x00AF1164
+    jsr Beep
     jmp CtrlLoop
+    
+  Beep:
+  
+  	move.b 0x00AF0061, d3
+  	move.b d3, d4
+  	ori.b #0x03, d4
+  	move.b #0xB6,0x00AF0043
+  	move.b #0xD0,0x00AF0042
+  	move.b #0x11,0x00AF0042
+  	move.b d4, 0x00AF0061
+    move.w #0xFFFF, d5
+  BeepDelay:
+    subi.w #0x0001, d5
+  	tst.w d5
+  	bne.w BeepDelay
+  	move.b d3, 0x00AF0061
+  	rts
 	
 INT_VBlank:
 	rte
