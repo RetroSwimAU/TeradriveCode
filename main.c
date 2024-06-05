@@ -13,7 +13,7 @@ int main(void)
     char far* psg_memory = 0xCE000011L; // PSG memory is $C00011 in 68K space.
                                         // PC -> 68K window described later.
 
-    int magicWordsPos = MAGICWORDS;  // Is meant to show the RAM adderess of the magic words, but not sure it's accurate.
+    int magicWordsPos = MAGICWORDS;  // Is meant to show the RAM address of the magic words, but not sure it's accurate.
 
     char result = 0;
 
@@ -37,7 +37,7 @@ int main(void)
     printf("\r\nPrepare 68K registers\r\n");
 
     outp(0x1160, 0x21); // Unclear what this does
-    outp(0x1163, 0x01); // Enable memory window PC->68K
+    outp(0x1163, 0x01); // Unclear what bit 0 here does
     outp(0x1166, 0x00); // Default starting location for memory window,
     outp(0x1167, 0x00); // allows 'TMSS' code to find magic words in <=640KB region.
 
@@ -64,7 +64,7 @@ int main(void)
     }
 
     outp(0x1162, 0xCE); // Should already be CE. Determines the address in PC space of an 8k window to 68K space. 
-    outp(0x1163, 0x03); // Enable said window
+    outp(0x1163, 0x03); // Enable said window (bit 1 on)
     
     // 8K window in 68K space begins at:
     //   (reg 0x1167 & 0x0F) << 20 
