@@ -70,7 +70,7 @@ After the ROM has booted, press C on the controller to switch to PC VGA output, 
   
 ### Issues
 * Needs an ISA POST analyser card listening on port 0x80 installed.
-* Singe (I guess) not all the VDP ram is written to, there are artifacts.
+* Since (I guess) not all the VDP ram is written to, there are artifacts.
 
 ### Resources
 * Same forum post as above
