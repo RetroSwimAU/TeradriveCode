@@ -15,7 +15,9 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
   * No action is required to 'activate' this functionality, from what I can tell. My test below writes to $AF0080 without any specific prep and it 'just works'.
   * Since the 286 CPU is normally halted while M68K runs code, you could feasibly use the PC's RAM as an extra megabyte-ish for MD software (excluding ROM BIOS region etc)???
   * Setting $AE0003 in M68K RAM lets you select a "bank" of 1MB from the PC side to view. However TeraDrive only has 2.5MB of RAM tops, and no MMIO to speak of. So probably of limited usefulness.
-  * All I've done with this is write a byte to 0x80 for display on a POST card. Could make the PC speaker beep or something I guess!
+  * I have written a small demo that puts some text on the Mega Drive's display using the VDP, and some text on the PC's display using VGA, and lets you toggle between them by pushing B and C on the controller.
+    * VGA RAM begins at `B800:0000`, default 80col text mode uses 1 attribute byte and 1 character byte per displayed character.
+    * A beep also plays thru the PC speaker, by writing to IO ports `0x42 0x43 and 0x61` (`$AF0042, $AF0043, $AF0061` respestively in M68K space)
 * Accessing MD resources from PC
   * The system must first be "unlocked". See above forum post, or `main.c` for what this entails.
     * tl;dr Sets some of the M68K registers with port writes to `0x1160 - 0x1167`
@@ -60,16 +62,15 @@ Should just need to clone and `wmake` in this directory.
   * https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-06-01-Build
 
 ## PC IO writes from MD side
-![GPITWSba8AAq1g-](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/ab0012ab-d667-40b1-ba22-a88d5359980b)
+![prUXzvm-Imgur-ezgif com-optimize](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/879d511e-2527-4cc0-b34e-e03368cb1e10)
 
 Download MD Studio, open `hello_world_with_PC_IO_write.s`, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.
 
-These instructions are equivalent on the TeraDrive.
-* 68K: `move.b #0xAA,0x00AF0080`
-* PC: `mov al, AAh; out 80h, al;`
+After the ROM has booted, press C on the controller to switch to PC VGA output, and C to switch to MegaDrive VDP output. The PC speaker will beep. At all times, the code is running on the M68K.
   
 ### Issues
 * Needs an ISA POST analyser card listening on port 0x80 installed.
+* Singe (I guess) not all the VDP ram is written to, there are artifacts.
 
 ### Resources
 * Same forum post as above
