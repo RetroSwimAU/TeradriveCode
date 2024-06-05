@@ -141,7 +141,11 @@ SetVRAMWrite: macro addr
 SetCRAMWrite: macro addr
 	move.l  #(vdp_cmd_cram_write)|((\addr)&$3FFF)<<16|(\addr)>>14, vdp_control
     endm
-
+    
+StatusWrite: macro val
+	move.b #(\val),0x00AF0080
+	endm
+	
 	; Palette
 Palette:
 	dc.w 0x0000	; Transparent
@@ -234,6 +238,8 @@ CharacterD:
 
 CPU_EntryPoint
 
+	; This writes 'HELLO WORLD' to the Sega VDP.
+
 	jsr VDP_WriteTMSS
 	jsr VDP_LoadRegisters
 	
@@ -274,11 +280,96 @@ CPU_EntryPoint
 	move.w #0x0007, vdp_data	; D
 	
 	; Write 0xAA to PC IO port 0x80 - value will display on POST card
-	move.b #0xAA,0x00AF0080
-	
-	; Halt CPU
-	stop   #0x2700
+	StatusWrite 0xAA
+	move.b #0x83,0x00AF1164
+	StatusWrite 0xBB
 
+ 	; This writes some demo text into PC Video RAM at $B800:0000 ($BB8000 in MD space)
+	
+	move.w #0x579E, 0x00BB8000
+	move.w #0x729E, 0x00BB8002
+	move.w #0x699E, 0x00BB8004
+	move.w #0x749E, 0x00BB8006
+	move.w #0x699E, 0x00BB8008
+	move.w #0x6E9E, 0x00BB800A
+	move.w #0x679E, 0x00BB800C
+	move.w #0x209E, 0x00BB800E
+	move.w #0x569E, 0x00BB8010
+	move.w #0x479E, 0x00BB8012
+	move.w #0x419E, 0x00BB8014
+	move.w #0x209E, 0x00BB8016
+	move.w #0x549E, 0x00BB8018
+	move.w #0x459E, 0x00BB801A
+	move.w #0x589E, 0x00BB801C
+	move.w #0x549E, 0x00BB801E
+	move.w #0x209E, 0x00BB8020
+	move.w #0x669E, 0x00BB8022
+	move.w #0x729E, 0x00BB8024
+	move.w #0x6F9E, 0x00BB8026
+	move.w #0x6D9E, 0x00BB8028
+	move.w #0x209E, 0x00BB802A
+	move.w #0x4D9E, 0x00BB802C
+	move.w #0x369E, 0x00BB802E
+	move.w #0x389E, 0x00BB8030
+	move.w #0x4B9E, 0x00BB8032
+	move.w #0x209E, 0x00BB8034
+	move.w #0x6F9E, 0x00BB8036
+	move.w #0x6E9E, 0x00BB8038
+	move.w #0x209E, 0x00BB803A
+	move.w #0x549E, 0x00BB803C
+	move.w #0x659E, 0x00BB803E
+	move.w #0x729E, 0x00BB8040
+	move.w #0x619E, 0x00BB8042
+	move.w #0x449E, 0x00BB8044
+	move.w #0x729E, 0x00BB8046
+	move.w #0x699E, 0x00BB8048
+	move.w #0x769E, 0x00BB804A
+	move.w #0x659E, 0x00BB804C
+	
+	StatusWrite 0xCC
+	
+	; Begin reading controller
+  CtrlLoop:
+	moveq	#$40,d0
+	move.b	d0,($A10009).l	; TH pin to write, others to read
+	move.b	d0,($A10003).l	; TH to 1
+	nop
+	nop
+	move.b	($A10003).l,d0
+	andi.b	#$3F,d0		; d0 = 00CBRLDU
+	moveq	#0,d1
+	move.b	#0,($A10003).l	; TH to 0
+	nop
+	nop
+	move.b	($A10003).l,d1
+	andi.b	#$30,d1		; d1 = 00SA0000
+	lsl.b	#2,d1		; d1 = SA000000
+	or.b	d1,d0		; d0 = SACBRLDU
+
+ 	; Press C to switch to PC display
+	move.b  #$20,d2 ; C test
+	and.b	d0, d2
+	tst.b   d2
+	beq.b   CPress
+
+ 	; Press B to switch to MD display
+	move.b  #$10,d2 ; B test
+	and.b	d0, d2
+	tst.b   d2
+	beq.b   BPress
+	
+	jmp CtrlLoop
+	
+  CPress:
+    
+    move.b #0x83,0x00AF1164
+    jmp CtrlLoop
+	
+  BPress:
+  
+    move.b #0x87,0x00AF1164
+    jmp CtrlLoop
+	
 INT_VBlank:
 	rte
 
