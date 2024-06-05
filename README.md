@@ -12,7 +12,7 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
   * While executing MegaDrive software, the PC's memory under 1MB is visible at `$B00000 - $BFFFFF`. This is space marked "Reserved" in most MD development resources.
     * Uses 20-bit notation, convert segmented addresses like `(segment << 4) + offset`
   * While executing MegaDrive software, the PC's IO space can be read/written by accessing memory at `$AF0000 - $AFFFFF`. This is space marked "Reserved" in most MD development resources.
-  * No action is required to 'activate' this functionality, from what I can tell. My test below writes to $AF0080 without any speficif prep and it 'just works'.
+  * No action is required to 'activate' this functionality, from what I can tell. My test below writes to $AF0080 without any specific prep and it 'just works'.
   * Since the 286 CPU is normally halted while M68K runs code, you could feasibly use the PC's RAM as an extra megabyte-ish for MD software (excluding ROM BIOS region etc)???
   * Setting $AE0003 in M68K RAM lets you select a "bank" of 1MB from the PC side to view. However TeraDrive only has 2.5MB of RAM tops, and no MMIO to speak of. So probably of limited usefulness.
   * All I've done with this is write a byte to 0x80 for display on a POST card. Could make the PC speaker beep or something I guess!
@@ -35,6 +35,8 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
     * The playback of the Master System music is, well, barbaric. The file is read a byte at a time, sending the PSG commands as it finds them, ignoring any wait/delay commands, as fast as it can. The fact I update the file position on the screen just happens to make it play sorta-kinda the right speed.
 
 ## MD PSG playback from PC side
+![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/87bc9323-5314-4551-88e6-4b3b46e08b6c)
+
 Should just need to clone and `wmake` in this directory.
 
 ### Issues
@@ -58,6 +60,8 @@ Should just need to clone and `wmake` in this directory.
   * https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-06-01-Build
 
 ## PC IO writes from MD side
+![GPITWSba8AAq1g-](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/ab0012ab-d667-40b1-ba22-a88d5359980b)
+
 Download MD Studio, open `hello_world_with_PC_IO_write.s`, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.
 
 These instructions are equivalent on the TeraDrive.
