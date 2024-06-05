@@ -9,27 +9,28 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
 * The 286 and M68K don't run at the same time. While one executes code, the other is held in reset.
   * Nemesis proposes there is a way to run the two CPUs simultaneously, see forum post above. I haven't verified this, but could make dev/debugging possible?
 * Accessing PC resources from MD
-  * While executing MegaDrive software, the PC's memory under 1MB is visible at $B00000 - $BFFFFF. This is space marked "Reserved" in most MD development resources.
+  * While executing MegaDrive software, the PC's memory under 1MB is visible at `$B00000 - $BFFFFF`. This is space marked "Reserved" in most MD development resources.
     * Uses 20-bit notation, convert segmented addresses like `(segment << 4) + offset`
-  * While executing MegaDrive software, the PC's IO space can be read/written by accessing memory at $AF0000 - $AFFFFF. This is space marked "Reserved" in most MD development resources.
+  * While executing MegaDrive software, the PC's IO space can be read/written by accessing memory at `$AF0000 - $AFFFFF`. This is space marked "Reserved" in most MD development resources.
   * No action is required to 'activate' this functionality, from what I can tell. My test below writes to $AF0080 without any speficif prep and it 'just works'.
   * Since the 286 CPU is normally halted while M68K runs code, you could feasibly use the PC's RAM as an extra megabyte-ish for MD software (excluding ROM BIOS region etc)???
   * Setting $AE0003 in M68K RAM lets you select a "bank" of 1MB from the PC side to view. However TeraDrive only has 2.5MB of RAM tops, and no MMIO to speak of. So probably of limited usefulness.
   * All I've done with this is write a byte to 0x80 for display on a POST card. Could make the PC speaker beep or something I guess!
 * Accessing MD resources from PC
   * The system must first be "unlocked". See above forum post, or `main.c` for what this entails.
-  * The forum post isn't clear on where the "PRODUCED BY..." text really needs to be. Initially, it says the M68K searches in PC ROM space at C000:0000, but then says it can at any even address in PC conventional memory (i.e. word boundaries). I rely on the fact that the C compiler put the string into the data segment on a word boundary. When I check the pointer value it's always even. I guess it's like that to facilitate 16 bit reads. I'm no C wizard lol.
-  * With the system "unlocked", the MegaDrive's memory can be read+written by the 286 thru an 8K window. The default window is at CE00:0000 - CE00:1FFF. For instance, to read MD address $5A5A5A:
+  * The forum post isn't clear on where the "PRODUCED BY..." text really needs to be. Initially, it says the M68K searches in PC ROM space at `C000:0000`, but then says it can at any even address in PC conventional memory (i.e. word boundaries). I rely on the fact that the C compiler put the string into the data segment on a word boundary. When I check the pointer value it's always even. I guess it's like that to facilitate 16 bit reads. I'm no C wizard lol.
+  * With the system "unlocked", the MegaDrive's memory can be read+written by the 286 thru an 8K window. The default window is at `CE00:0000 - CE00:1FFF`. For instance, to read MD address $5A5A5A:
     * Calculate bits:
-      * M68K "base address high" bits 20-23 = (0x5A5A5A & 0xF00000) >> 20 = 0x05
-      * M68K "base address low" bits 13-19 = (0x5A5A5A & 0x0FE000) >> 12 = 0xA4
-      * M68K "offset" bits 0-12 = (0x5A5A5A & 0x001FFF) = 0x1A5A
+      * M68K "base address high" bits 20-23 = `(0x5A5A5A & 0xF00000) >> 20 = 0x05`
+      * M68K "base address low" bits 13-19 = `(0x5A5A5A & 0x0FE000) >> 12 = 0xA4`
+      * M68K "offset" bits 0-12 = `(0x5A5A5A & 0x001FFF) = 0x1A5A`
     * Port writes:
-      * Port 0x1167, write "base address high"
-      * Port 0x1166, write "base address low"
+      * Port `0x1167`, write "base address high"
+      * Port `0x1166`, write "base address low"
     * Then finally:
-      * PC address CE00:1A5A
+      * PC address `CE00:1A5A`
   * This is how I access the PSG memory location for my demo.
+    * The calculations are easier though, because the PSG address is `$C00011`. All the middle bits are 0's :D
 
 ## MD PSG playback from PC side
 Should just need to clone and `wmake` in this directory.
