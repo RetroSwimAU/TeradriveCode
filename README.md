@@ -20,7 +20,7 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
   * The system must first be "unlocked". See above forum post, or `main.c` for what this entails.
     * tl;dr Sets some of the M68K registers with port writes to `0x1160 - 0x1167`
   * The forum post isn't clear on where the "PRODUCED BY..." text really needs to be. Initially, it says the M68K searches in PC ROM space at `C000:0000`, but then says it can at any even address in PC conventional memory (i.e. word boundaries). I rely on the fact that the C compiler put the string into the data segment on a word boundary. When I check the pointer value it's always even. I guess it's like that to facilitate 16 bit reads. I'm no C wizard lol.
-  * With the system "unlocked", the MegaDrive's memory can be read+written by the 286 thru an 8K window. The default window is at `CE00:0000 - CE00:1FFF`. For instance, to read MD address $5A5A5A:
+  * With the system "unlocked", the MegaDrive's memory can be read+written by the 286 thru an 8K window. The default window is at `CE00:0000 - CE00:1FFF`. For instance, to read MD address `$5A5A5A`:
     * Calculate bits:
       * M68K "base address high" bits 20-23 = `(0x5A5A5A & 0xF00000) >> 20 = 0x05`
       * M68K "base address low" bits 13-19 = `(0x5A5A5A & 0x0FE000) >> 12 = 0xA4`
