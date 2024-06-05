@@ -66,7 +66,7 @@ Should just need to clone and `wmake` in this directory.
 
 Download MD Studio, open `hello_world_with_PC_IO_write.s`, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.
 
-After the ROM has booted, press C on the controller to switch to PC VGA output, and C to switch to MegaDrive VDP output. The PC speaker will beep. At all times, the code is running on the M68K.
+After the ROM has booted, press C on the controller to switch to PC VGA output, and B to switch to MegaDrive VDP output. The PC speaker will beep. At all times, the code is running on the M68K.
   
 ### Issues
 * Needs an ISA POST analyser card listening on port 0x80 installed.
