@@ -18,6 +18,7 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
   * All I've done with this is write a byte to 0x80 for display on a POST card. Could make the PC speaker beep or something I guess!
 * Accessing MD resources from PC
   * The system must first be "unlocked". See above forum post, or `main.c` for what this entails.
+    * tl;dr Sets some of the M68K registers with port writes to `0x1160 - 0x1167`
   * The forum post isn't clear on where the "PRODUCED BY..." text really needs to be. Initially, it says the M68K searches in PC ROM space at `C000:0000`, but then says it can at any even address in PC conventional memory (i.e. word boundaries). I rely on the fact that the C compiler put the string into the data segment on a word boundary. When I check the pointer value it's always even. I guess it's like that to facilitate 16 bit reads. I'm no C wizard lol.
   * With the system "unlocked", the MegaDrive's memory can be read+written by the 286 thru an 8K window. The default window is at `CE00:0000 - CE00:1FFF`. For instance, to read MD address $5A5A5A:
     * Calculate bits:
@@ -31,6 +32,7 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
       * PC address `CE00:1A5A`
   * This is how I access the PSG memory location for my demo.
     * The calculations are easier though, because the PSG address is `$C00011`. All the middle bits are 0's :D
+    * The playback of the Master System music is, well, barbaric. The file is read a byte at a time, sending the PSG commands as it finds them, ignoring any wait/delay commands, as fast as it can. The fact I update the file position on the screen just happens to make it play sorta-kinda the right speed.
 
 ## MD PSG playback from PC side
 Should just need to clone and `wmake` in this directory.
