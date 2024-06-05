@@ -67,8 +67,8 @@ int main(void)
     outp(0x1163, 0x03); // Enable said window
     
     // 8K window in 68K space begins at:
-    //   (reg 0x1167 & 0x0F) >> 20 
-    // + (reg 0x1166 & 0xFE) >> 12
+    //   (reg 0x1167 & 0x0F) << 20 
+    // + (reg 0x1166 & 0xFE) << 12
 
     outp(0x1167, 0x0C);
     outp(0x1166, 0x00); 
