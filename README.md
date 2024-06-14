@@ -32,12 +32,12 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
       * Port `0x1166`, write `0xA4`
     * Then finally:
       * PC address `CE00:1A5A`
+  * There is a 'CMOS Setup' type screen accessible by booting the TeraDrive in PC mode, choosing DOS from the boot menu, and spamming F1. On this screen you can select which PC segment the memory window appears in by default. The base address can be from `C800:0000` to `DE00:0000`. The default is `CE00:0000`
+    * The top two bytes are visible in register 1162. E.g. the default value is `0xCE`. This register can be updated by either CPU at runtime though.
   * This is how I access the PSG memory location for my demo.
     * The calculations are easier though, because the PSG address is `$C00011`. All the middle bits are 0's :D
     * The playback of the Master System music is, well, barbaric. The file is read a byte at a time, sending the PSG commands as it finds them, ignoring any wait/delay commands, as fast as it can. The fact I update the file position on the screen just happens to make it play sorta-kinda the right speed.
-    * There is a 'CMOS Setup' type screen accessible by booting the TeraDrive in PC mode, choosing DOS from the boot menu, and spamming F1. On this screen you can select which PC segment the memory window appears in. The base address can be from `C800:0000` to `DE00:0000`.
-      * The top two bytes are visible in register 1162, bits 1-4.
-      * If CMOS battery is dead, or values in CMOS NVRAM are invalid, the default is `CE00:0000`
+    
 
 ## MD PSG playback from PC side
 ![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/87bc9323-5314-4551-88e6-4b3b46e08b6c)
