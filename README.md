@@ -21,7 +21,7 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
 * Accessing MD resources from PC
   * The system must first be "unlocked". See above forum post, or `main.c` for what this entails.
     * tl;dr Sets some of the M68K registers with port writes to `0x1160 - 0x1167`
-  * The forum post isn't clear on where the "PRODUCED BY..." text really needs to be. Initially, it says the M68K searches in PC ROM space at `C000:0000`, but then says it can at any even address in PC conventional memory (i.e. word boundaries). I rely on the fact that the C compiler put the string into the data segment on a word boundary. When I check the pointer value it's always even. I guess it's like that to facilitate 16 bit reads. I'm no C wizard lol.
+  * ~~The forum post isn't clear on where the "PRODUCED BY..." text really needs to be. Initially, it says the M68K searches in PC ROM space at `C000:0000`, but then says it can at any even address in PC conventional memory (i.e. word boundaries).~~ When the registers `0x1166` and `0x1167` are both set to 0, this is a special case directing the M68K to search the PC conventional memory area `0000:0000 - A000:0000` for the "PRODUCED BY..." text. Details in the forum post above. I rely on the fact that the C compiler put the string into the data segment on a word boundary. When I check the pointer value it's always even. I guess it's like that to facilitate faster 16 bit reads. I'm no C wizard lol. 
   * With the system "unlocked", the MegaDrive's memory can be read+written by the 286 thru an 8K window. The default window is at `CE00:0000 - CE00:1FFF`. For instance, to read MD address `$5A5A5A`:
     * Calculate bits:
       * M68K "base address high" bits 20-23 = `(0x5A5A5A & 0xF00000) >> 20 = 0x05`
@@ -35,6 +35,9 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
   * This is how I access the PSG memory location for my demo.
     * The calculations are easier though, because the PSG address is `$C00011`. All the middle bits are 0's :D
     * The playback of the Master System music is, well, barbaric. The file is read a byte at a time, sending the PSG commands as it finds them, ignoring any wait/delay commands, as fast as it can. The fact I update the file position on the screen just happens to make it play sorta-kinda the right speed.
+    * There is a 'CMOS Setup' type screen accessible by booting the TeraDrive in PC mode, choosing DOS from the boot menu, and spamming F1. On this screen you can select which PC segment the memory window appears in. The base address can be from `C800:0000` to `DE00:0000`.
+      * The top two bytes are visible in register 1162, bits 1-4.
+      * If CMOS battery is dead, or values in CMOS NVRAM are invalid, the default is `CE00:0000`
 
 ## MD PSG playback from PC side
 ![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/87bc9323-5314-4551-88e6-4b3b46e08b6c)
