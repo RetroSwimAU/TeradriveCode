@@ -259,11 +259,11 @@ int main()
         }
         VDP_drawText("VGA A=Mode 13h B=80col Txt C=40col txt",0,8);
         VDP_drawText("Output Up=VDP Down=VGA",0,9);
-        XGM2_load(goodMusic);
-        XGM2_playTrack(0);
+        XGM_setLoopNumber(-1);
+        XGM_startPlay(&goodMusic);
     }else{
-        XGM2_load(badMusic);
-        XGM2_playTrack(0);
+        XGM_setLoopNumber(-1);
+        XGM_startPlay(&badMusic);
     }
 
     // Initialise RTC to 00:00:00 if it doesn't already contain a valid time.
