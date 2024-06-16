@@ -1,0 +1,11 @@
+{ 
+    "C_Cpp.default.includePath": ["D:\\source\\sgdk\\inc",
+    "D:\\source\\sgdk\\res",
+    "res",
+    "inc"
+],
+"files.associations": {
+    "teradrive.h": "c",
+    "genesis.h": "c"
+}
+}
