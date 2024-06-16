@@ -67,17 +67,19 @@ Should just need to clone and `wmake` in this directory.
 ## PC IO writes from MD side
 ![prUXzvm-Imgur-ezgif com-optimize](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/879d511e-2527-4cc0-b34e-e03368cb1e10)
 
-Download MD Studio, open `hello_world_with_PC_IO_write.s`, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.
+***A NEW DEMO HAS BEEN RELEASED, DETAILS TO FOLLOW***
 
-After the ROM has booted, press C on the controller to switch to PC VGA output, and B to switch to MegaDrive VDP output. The PC speaker will beep. At all times, the code is running on the M68K.
+~~Download MD Studio, open `hello_world_with_PC_IO_write.s`, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.~~
+
+~~After the ROM has booted, press C on the controller to switch to PC VGA output, and B to switch to MegaDrive VDP output. The PC speaker will beep. At all times, the code is running on the M68K.~~
   
-### Issues
-* Needs an ISA POST analyser card listening on port 0x80 installed.
-* Since (I guess) not all the VDP ram is written to, there are artifacts.
+### ~~Issues~~
+* ~~Needs an ISA POST analyser card listening on port 0x80 installed.~~
+* ~~Since (I guess) not all the VDP ram is written to, there are artifacts.~~
 
 ### Resources
 * Same forum post as above
-* MD Studio was used to build 68K ASM into a bootable Mega Drive BIN file
-  * https://github.com/gouky/MDStudio
-  * Credit: gouky
-* Source is from https://github.com/BigEvilCorporation/megadrive_samples but with my line added.
+* ~~MD Studio was used to build 68K ASM into a bootable Mega Drive BIN file~~
+  * ~~https://github.com/gouky/MDStudio~~
+  * ~~Credit: gouky~~
+* ~~Source is from https://github.com/BigEvilCorporation/megadrive_samples but with my line added.~~
