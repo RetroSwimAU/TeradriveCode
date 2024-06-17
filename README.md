@@ -42,7 +42,7 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
 ## MD PSG playback from PC side
 ![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/87bc9323-5314-4551-88e6-4b3b46e08b6c)
 
-Should just need to clone and `wmake` in this directory.
+As long as you have OpenWatcom installed and the requisite environments set, should just need to clone the repo and `wmake` in the PC directory.
 
 ### Issues
 * ~~Sometimes hangs on `outp(0x1164, 0x81);`. I think the M68k isn't coming out of reset. I'm not sure why.~~
@@ -65,21 +65,30 @@ Should just need to clone and `wmake` in this directory.
   * https://github.com/open-watcom/open-watcom-v2/releases/tag/2024-06-01-Build
 
 ## PC IO writes from MD side
-![prUXzvm-Imgur-ezgif com-optimize](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/879d511e-2527-4cc0-b34e-e03368cb1e10)
 
-***A NEW DEMO HAS BEEN RELEASED, DETAILS TO FOLLOW***
+![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/d5289727-6aba-45ec-a08a-7bf9caca01d0)
 
-~~Download MD Studio, open `hello_world_with_PC_IO_write.s`, and build. Put resulting BIN file on EverDrive/etc, boot on TeraDrive in MD mode.~~
+As of 0.4 this is now the more sophisticated of the two demos.
 
-~~After the ROM has booted, press C on the controller to switch to PC VGA output, and B to switch to MegaDrive VDP output. The PC speaker will beep. At all times, the code is running on the M68K.~~
-  
-### ~~Issues~~
-* ~~Needs an ISA POST analyser card listening on port 0x80 installed.~~
-* ~~Since (I guess) not all the VDP ram is written to, there are artifacts.~~
+To build, you need SGDK installed and configured. I used the VSCode extension Genesis Code. With those set up, open the MD folder in VSCode and hit build.
+
+### Features:
+* Detects if running on an emulator or normal Mega Drive/Genesis. Try it! :)
+* Draws text to the VDP, showing the PC'S RTC, frame counter, and some status info and instructions. As well as a fun sprite and some music. This done using SGDK routines, all very standard. Just to show the MD hardware is being used.
+* Shows text and a frame counter on the VGA screen, in either 40 col or 80 col mode. Press B for 80 columns, C for 40 columns.
+  * This respects the RGB/Video switch on the back of the system, and uses the 15kHz variants of VGA modes as appropriate.
+  * Backs up VRAM to conventional RAM when switching away from text mode (and restores when leaving graphics mode), since x86 interrupts are unavailable to the M68K, mode switches are done with pure register writes. This was a simple method to to fix font and palette corruption.
+* Pushing A shows a graphical screen in mode 13h, with palette cycling.
+* Pushing up or down switches the output between VGA and MD VDP.
+  * When the rear switch is set to "Video", the composite output follows the toggle, and VGA uses 15kHz modes.
+  * When set to "RGB", the composite output always stays on VDP, and the PC uses 31kHz modes.
+* Greets and credits!
+
+Sample: https://youtu.be/o8Qj7M0l1RY
 
 ### Resources
-* Same forum post as above
-* ~~MD Studio was used to build 68K ASM into a bootable Mega Drive BIN file~~
-  * ~~https://github.com/gouky/MDStudio~~
-  * ~~Credit: gouky~~
-* ~~Source is from https://github.com/BigEvilCorporation/megadrive_samples but with my line added.~~
+
+* SGDK - https://github.com/Stephane-D/SGDK
+* VGA without int 10h - https://github.com/jedld/dex-os/blob/master/hardware/vga/dexvga.c
+* VGA register programming - http://www.osdever.net/FreeVGA/vga/vga.htm
+  
