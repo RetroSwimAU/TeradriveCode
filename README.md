@@ -77,7 +77,7 @@ To build, you need SGDK installed and configured. I used the VSCode extension Ge
 * Draws text to the VDP, showing the PC'S RTC, frame counter, and some status info and instructions. As well as a fun sprite and some music. This done using SGDK routines, all very standard. Just to show the MD hardware is being used.
 * Shows text and a frame counter on the VGA screen, in either 40 col or 80 col mode. Press B for 80 columns, C for 40 columns.
   * This respects the RGB/Video switch on the back of the system, and uses the 15kHz variants of VGA modes as appropriate.
-  * Backs up VRAM to conventional RAM when switching away from text mode (and restores when leaving graphics mode), since x86 interrupts are unavailable to the M68K, mode switches are done with pure register writes. This was a simple method to to fix font and palette corruption.
+  * Backs up VRAM and DAC registers to PC conventional RAM when switching away from text mode (and restores when leaving graphics mode), since x86 interrupts are unavailable to the M68K, mode switches are done with pure register writes. This was a simple method to to fix font and palette corruption.
 * Pushing A shows a graphical screen in mode 13h, with palette cycling.
 * Pushing up or down switches the output between VGA and MD VDP.
   * When the rear switch is set to "Video", the composite output follows the toggle, and VGA uses 15kHz modes.
