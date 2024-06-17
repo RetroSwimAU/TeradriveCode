@@ -82,6 +82,7 @@ To build, you need SGDK installed and configured. I used the VSCode extension Ge
 * Pushing up or down switches the output between VGA and MD VDP.
   * When the rear switch is set to "Video", the composite output follows the toggle, and VGA uses 15kHz modes.
   * When set to "RGB", the composite output always stays on VDP, and the PC uses 31kHz modes.
+* Writes frame counter to PC IO port `0x80`, converted to BCD, so hex display on POST analyser card shows "decimal" frame count! 
 * Greets and credits!
 
 Sample: https://youtu.be/o8Qj7M0l1RY
