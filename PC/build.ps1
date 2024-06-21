@@ -102,3 +102,9 @@ if($architecture -eq "32bit")
 }
 
 & $command $wclArguments
+
+# Copy assets to bin
+$source = '.\assets'
+$dest = '.\bin'
+$exclude = @('readme.md')
+Get-ChildItem $source -Recurse -Exclude $exclude | Copy-Item -Destination {Join-Path $dest $_.Name}
