@@ -1,0 +1,13 @@
+{
+    "[c]": {
+        "editor.wordBasedSuggestions": "off",
+        "editor.suggest.insertMode": "replace",
+        "editor.semanticHighlighting.enabled": true
+    },
+    "files.associations": {
+        "stdio.h": "c",
+        "i86.h": "c",
+        "vga.h": "c",
+        "malloc.h": "c"
+    }
+}
