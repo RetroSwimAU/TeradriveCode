@@ -22,7 +22,29 @@ char biosVersion[] = "79F2478";
 
 unsigned char font[768];
 
+unsigned char helloWorld[] = "Hello, world!";
+
 const unsigned char VDP_SETUP[] = { 0x04, 0x04, 0x30, 0x3C, 0x07, 0x6C, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x81, 0x37, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00 };
+
+unsigned long byteToDword(unsigned char in, unsigned char value){
+	unsigned long thisLong = 0;
+	unsigned char newValue = value & 0x0F;
+	unsigned char mask = 0;
+	unsigned long newLong = 0;
+
+	int k;
+
+	for(k = 0; k < 8; k++){
+		mask = 1 << k;
+		if(in & mask){
+			newLong = (unsigned long)0x0000000F << (unsigned long)(k * 4);
+			thisLong |= newLong;
+		}
+	}
+
+	return thisLong;
+		
+}
 
 void MD_init(){
     outp(0x1160, 0x21); // Selects 8KB ROM firmware page. 
@@ -57,6 +79,8 @@ void MD_setBase(unsigned char base){
     mdMemoryL = (unsigned long far *)newBase;
 }
 
+// Endianness fixes apply for word/dword reads+writes. There is probably a faster way to do this but eh
+
 void MD_memoryWriteB(unsigned long addr, unsigned char data){
     unsigned int offset = (unsigned int)(addr & 0x001FFF);
     mdMemory[offset] = data;
@@ -66,14 +90,12 @@ void MD_memoryWriteW(unsigned long addr, unsigned int data){
     unsigned int offset = (unsigned int)(addr & 0x001FFF) >> 1;
     unsigned int newData = data << 8 | data >> 8;
     mdMemoryW[offset] = newData;
-    // mdMemoryW[offset] = data;
 }
 
 void MD_memoryWriteL(unsigned long addr, unsigned long data){
     unsigned int offset = (unsigned int)(addr & 0x001FFF) >> 2;
     unsigned long newData = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00) << 8 | (data & 0x000000FF) << 24;
     mdMemoryL[offset] = newData;
-    // mdMemoryL[offset] = data;
 }
 
 int MD_setup(){
@@ -126,9 +148,9 @@ unsigned char MD_isRGB(){
 }
 
 void MD_startVDP(){
-    const unsigned char helloWorld[] = "Hello World";
     unsigned int i;
     unsigned long j;
+    unsigned char k;
     unsigned char thisChar;
     unsigned char thisVDPByte;
     unsigned long thisVDPLong;
@@ -153,29 +175,20 @@ void MD_startVDP(){
 
     MD_memoryWriteL(VDP_CONTROL, VDP_VRAM);
 
-    // THIS ISN'T WORKING PROPERLY.
+    // Load font to VRAM
     for(i = 0; i < 768; i++){
         thisChar = font[i];
-        thisVDPByte = ((thisChar & 0x01) >> 0) * 0x0F | ((thisChar & 0x02) >> 1) * 0xF0;
-        MD_memoryWriteB(VDP_DATA, thisVDPByte);
-        thisVDPByte = ((thisChar & 0x04) >> 2) * 0x0F | ((thisChar & 0x08) >> 3) * 0xF0;
-        MD_memoryWriteB(VDP_DATA, thisVDPByte);
-        thisVDPByte = ((thisChar & 0x10) >> 4) * 0x0F | ((thisChar & 0x20) >> 1) * 0xF0;
-        MD_memoryWriteB(VDP_DATA, thisVDPByte);
-        thisVDPByte = ((thisChar & 0x40) >> 6) * 0x0F | ((thisChar & 0x80) >> 7) * 0xF0;
-        MD_memoryWriteB(VDP_DATA, thisVDPByte);
+
+        // 8 bits -> 4 bytes. E.g. b10010110 -> 0xF00F0FF0;
+        thisVDPLong = byteToDword(thisChar, 0x0F);
+        MD_memoryWriteL(VDP_DATA, thisVDPLong);
     }
 
     // This and the VRAM writes below seem to be good though.
     // It produces garbage, but it's garbage that follows the pattern of Hello World! haha
     MD_memoryWriteW(VDP_CONTROL, VDP_ENABLE_SCREEN);
 
-    for(i = 0; i < 12; i++){
-        j = 0xC000 + (i * 2);
-        thisVDPLong = VDP_VRAM | ((j & 0x3FFF) << 16) | ((j & 0xC000) >> 14);
-        MD_memoryWriteL(VDP_CONTROL, thisVDPLong);
-        MD_memoryWriteW(VDP_DATA, 0x0000 | (unsigned int)(helloWorld[i] - 32) );
-    }
+    MD_print(0, 0, helloWorld, 13);
 
     // for(i = 128; i < 140; i++){
     //     j = 0xC000 + (i * 2);
@@ -214,4 +227,23 @@ unsigned char MD_loadfont(){
     }
 
     return 1;
+}
+
+void MD_print(unsigned char x, unsigned char y, unsigned char* text, unsigned int len){
+    unsigned int i;
+    unsigned long j;
+    unsigned long thisVDPLong;
+    unsigned int thisVDPInt;
+
+    unsigned int offset = x * 2 + y * 128;
+
+    MD_updateWindow(VDP_CONTROL);
+
+    for(i = 0; i < len; i++){
+        j = 0xC000 + offset + (i * 2);
+        thisVDPLong = VDP_VRAM | ((j & 0x3FFF) << 16) | ((j & 0xC000) >> 14);
+        MD_memoryWriteL(VDP_CONTROL, thisVDPLong);
+        MD_memoryWriteW(VDP_DATA, 0x0000 | (unsigned int)(helloWorld[i] - 32));
+    }
+
 }

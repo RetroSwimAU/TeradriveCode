@@ -31,3 +31,4 @@ int MD_setup();
 unsigned char MD_isRGB();
 void MD_startVDP();
 unsigned char MD_loadfont();
+void MD_print(unsigned char x, unsigned char y, unsigned char* text, unsigned int len);
