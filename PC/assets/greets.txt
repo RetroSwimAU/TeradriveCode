@@ -1,0 +1,47 @@
+ษอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออป
+บ                                                           บ
+บ        T E R A D R I V E - P C  S I D E  D E M O          บ
+บ                                                           บ
+บ              R e t r o S w i m  2 0 2 4                   บ
+บ                                                           บ
+บ  This is the other half of the MegaDrive ROM I released   บ
+บ  a few weeks ago. We put some text on the VDP screen,     บ
+บ  and are playing the music on the PSG on an interrupt.    บ
+บ                                                           บ
+บ  If the TeraDrive's rear switch is in the RGB position,   บ
+บ  you should see the MegaDrive side output on composite.   บ
+บ                                                           บ
+บ  If it's in the Video position, the PC output should be   บ
+บ  showing right now.                                       บ
+บ                                                           บ
+บ  Press SPACE to toggle the output between VGA and VDP.    บ
+บ  In RGB mode, the composite output sticks to VDP.         บ
+บ                                                           บ
+บ  Got a MegaDrive controller plugged in to port 1?         บ
+บ  You should try pressing down on the Dpad!                บ
+บ                                                           บ
+บ  HOWDY SAILOR :D                                          บ
+บ                                                           บ
+บ  I know these are bread-and-butter PC demo effects, but   บ
+บ  I thought I could hide the vanity stuff down here lol.   บ
+บ                                                           บ
+บ  PC demo resources:                                       บ
+บ  Interrupt-driven VGM playback: @MrKsoft486 (Twitter)     บ
+บ  https://github.com/MrKsoft/vgmslap                       บ
+บ  PC VGA stuff:                                            บ
+บ  https://gist.github.com/root42 root42 (Youtube)          บ
+บ  http://www.osdever.net/FreeVGA/vga/vga.htm               บ
+บ  MD VDP stuff:                                            บ
+บ  https://plutiedev.com/vdp-commands @plutiedev (Twitter)  บ
+บ  https://www.chibiakumas.com/68000/genesis.php            บ
+บ                                                           บ
+บ  Tools:                                                   บ
+บ  Visual Studio Code                                       บ
+บ  OpenWatcom 2.0                                           บ
+บ                                                           บ
+บ  MiniGreets:                                              บ
+บ  CloakedAlien, Coburn64, 48kram, TarXsix, Dan Salvato     บ
+บ  LGR, Kris Asick, Neil @ RMC, Bits und Bolts              บ
+บ  For full-size greets, run the MD side demo!! <3          บ
+บ                                                           บ
+ศอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออผ

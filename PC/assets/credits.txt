@@ -1,9 +1,0 @@
-Interrupt-driven playback code: @MrKsoft486 (Twitter)
-https://github.com/MrKsoft/vgmslap
-
-PC VGA stuff: root42 (Youtube)
-https://gist.github.com/root42
-
-MD VDP stuff:
-https://plutiedev.com/vdp-commands @plutiedev (Twitter)
-https://www.chibiakumas.com/68000/helloworld.php#LessonH5 

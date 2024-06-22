@@ -17,11 +17,18 @@
 
 #define VDP_VRAM 0x40000000
 
+#define Z80_BUSREQ 0xA11100
+
+#define CONTROLLER_DATA 0xA10003
+#define CONTROLLER_CONTROL 0xA10009
+
 #define FONT_FILE "font.bin"
 
 void MD_init();
 void MD_boot68K();
 void MD_enableWindow();
+void MD_saveWindow();
+void MD_restoreWindow();
 void MD_updateWindow(long addr);
 void MD_setBase(unsigned char base);
 void MD_memoryWriteB(unsigned long addr, unsigned char data);
@@ -32,3 +39,7 @@ unsigned char MD_isRGB();
 void MD_startVDP();
 unsigned char MD_loadfont();
 void MD_print(unsigned char x, unsigned char y, unsigned char* text, unsigned int len);
+unsigned char MD_readController();
+unsigned char MD_memoryReadB(unsigned long addr);
+void MD_setVGA();
+void MD_setVDP();

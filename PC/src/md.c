@@ -12,6 +12,7 @@
 #include "md.h"
 
 unsigned char last_upper, last_lower;
+unsigned char saved_upper, saved_lower;
 
 unsigned char far *mdMemory = (unsigned char far *)0xCE000000;
 unsigned int far *mdMemoryW = (unsigned int far *)0xCE000000;
@@ -70,6 +71,22 @@ void MD_updateWindow(long addr){
         outp(0x1167, upper);
         outp(0x1166, lower);
     }
+    last_upper = upper;
+    last_lower = lower;
+}
+
+void MD_saveWindow(){
+    saved_upper = last_lower;
+    saved_lower = last_lower;
+}
+
+void MD_restoreWindow(){
+    if(saved_upper != last_upper | saved_lower != last_lower){
+        outp(0x1167, saved_upper);
+        outp(0x1166, saved_lower);
+    }
+    last_upper = saved_upper;
+    last_lower = saved_lower;
 }
 
 void MD_setBase(unsigned char base){
@@ -96,6 +113,11 @@ void MD_memoryWriteL(unsigned long addr, unsigned long data){
     unsigned int offset = (unsigned int)(addr & 0x001FFF) >> 2;
     unsigned long newData = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00) << 8 | (data & 0x000000FF) << 24;
     mdMemoryL[offset] = newData;
+}
+
+unsigned char MD_memoryReadB(unsigned long addr){
+    unsigned int offset = (unsigned int)(addr & 0x001FFF);
+    return mdMemory[offset];
 }
 
 int MD_setup(){
@@ -130,13 +152,21 @@ int MD_setup(){
         return 0;
     }
 
-    printf("OK let's go.\n");
+    printf("All systems nominal..\n");
 
     MD_enableWindow();
     MD_setBase(inp(0x1162));
 
     printf("MD memory visible at %04X:%04X-%04X:%04X\n\n", FP_SEG(mdMemory), 
                 FP_OFF(mdMemory), FP_SEG(mdMemory), FP_OFF(mdMemory) + 0x1FFF);
+
+    // Controller init
+    MD_updateWindow(CONTROLLER_DATA);
+    MD_memoryWriteW(Z80_BUSREQ, 0x0100);
+    MD_memoryWriteB(CONTROLLER_CONTROL, 0x40);
+    MD_memoryWriteB(CONTROLLER_DATA, 0x40);
+    MD_memoryWriteW(Z80_BUSREQ, 0x0000);
+    
 
     MD_startVDP();
 
@@ -234,16 +264,71 @@ void MD_print(unsigned char x, unsigned char y, unsigned char* text, unsigned in
     unsigned long j;
     unsigned long thisVDPLong;
     unsigned int thisVDPInt;
+    unsigned char thisLinePos = 0;
 
     unsigned int offset = x * 2 + y * 128;
 
+    MD_saveWindow();
     MD_updateWindow(VDP_CONTROL);
 
     for(i = 0; i < len; i++){
         j = 0xC000 + offset + (i * 2);
-        thisVDPLong = VDP_VRAM | ((j & 0x3FFF) << 16) | ((j & 0xC000) >> 14);
-        MD_memoryWriteL(VDP_CONTROL, thisVDPLong);
-        MD_memoryWriteW(VDP_DATA, 0x0000 | (unsigned int)(helloWorld[i] - 32));
-    }
 
+        if(text[i] == 0x0A){
+            offset += (63 - (thisLinePos)) * 2;
+            thisLinePos = 0;
+        }else{
+            thisVDPLong = VDP_VRAM | ((j & 0x3FFF) << 16) | ((j & 0xC000) >> 14);
+            MD_memoryWriteL(VDP_CONTROL, thisVDPLong);
+            MD_memoryWriteW(VDP_DATA, 0x0000 | (unsigned int)(text[i] - 32));
+            thisLinePos++;
+        }
+        
+    }
+    MD_restoreWindow();
+}
+
+void do_nothing();
+#pragma aux do_nothing = "nop"
+
+unsigned char MD_readController(){
+    unsigned char result = 0, result2 = 0;
+    MD_saveWindow();
+    MD_updateWindow(CONTROLLER_DATA);
+    MD_memoryWriteW(Z80_BUSREQ, 0x0100);
+    MD_memoryWriteB(CONTROLLER_DATA, 0x40);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    result = ~MD_memoryReadB(CONTROLLER_DATA);
+    MD_memoryWriteB(CONTROLLER_DATA, 0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    outp(0x330,0x00);
+    result2 = ~MD_memoryReadB(CONTROLLER_DATA);
+    MD_memoryWriteW(Z80_BUSREQ, 0x0000);
+    MD_restoreWindow();
+    return ((result & 0x3F) | ((result2 & 0x30) << 2));
+}
+
+void MD_setVGA(){
+    outp(0x1164, inp(0x1164) & ~0x04);
+}
+
+void MD_setVDP(){
+    outp(0x1164, inp(0x1164) | 0x04);
 }

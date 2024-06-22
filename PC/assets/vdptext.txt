@@ -1,0 +1,19 @@
+Greetings beautiful human!
+
+It doesn't look like much, but this
+means we have written to VRAM on the
+Mega Drive VDP, from PC land. Scrolling,
+sprites, and the works are on the table!
+
+PSG writes are happening, and though I
+have not tested it yet, I don't see why
+Z80 and YM2612 wouldn't be doable.
+
+This is just the beginning.
+
+twitch.tv/RetroSwim
+Fedi @retroswim@bitbang.social
+Twitter @RetroSwimAU
+YouTube @retroswim
+
+Be kind <3

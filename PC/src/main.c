@@ -12,6 +12,8 @@
 #include "vga.h"
 #include "md.h"
 #include "music.h"
+#include "greets.h"
+#include "vdptext.h"
 
 #define FILE_MESSAGE " is missing or something."
 
@@ -39,13 +41,37 @@ unsigned long il, jk, kl, ml, nl;
 
 unsigned char isRGB = 0;
 
+int scrollLine = 0;
+unsigned int scrollChar = 0;
+unsigned char scrollPixel = 0;
+
+unsigned char lastChar = 0;
+unsigned char lastVideo = 0;
+
+unsigned char controllerState = 0;
+
 void fillScreen(){
+    
+    unsigned int textPos = (80 * 2 * 3) + 18;
+
     n = 0;
     for(m = 0; m < 16000; m += 2){
         if(m % 16 == 0) n++;
         if(m % 160 == 0) n = 0;
         textScreen[m] = 0xB0;
         textScreen[m+1] = barColours[n];
+    }
+
+    for(i = 0; i < greetsLen; i++){
+        if(greets[i] == 0x0A){
+            textPos += 36;
+        } else if(greets[i] != 0x20){
+            textScreen[textPos] = greets[i];
+            textScreen[textPos + 1] = 0x0B;
+        }
+        textPos += 2;
+
+
     }
 }
 
@@ -74,6 +100,38 @@ char checkFiles(){
     if(_access(FONT_FILE, R_OK) != 0) { fail++; printf("%s %s\n", FONT_FILE, FILE_MESSAGE); }
     if(fail) return 0;
     return 1;
+}
+
+void toggleVideo(){
+    if(lastVideo){
+        MD_setVGA();
+        lastVideo = 0;
+    }else{
+        MD_setVDP();
+        lastVideo = 1;
+    }
+}
+
+void doScrollingRT(){
+    
+    
+    outp( CRTC_INDEX, PRESET_ROW_SCAN );
+    outp( CRTC_DATA, scrollPixel & 0x0F );
+
+}
+
+void doScrolling(){
+
+    if(scrollLine < 0) scrollLine = 0;
+    if(scrollLine > 399) scrollLine = 399;
+    scrollPixel = scrollLine % 16;
+    scrollChar = (scrollLine / 16) * 80;
+
+    outp( CRTC_INDEX, HIGH_ADDRESS );
+    outp( CRTC_DATA, (unsigned char)((scrollChar & 0xFF00) >> 8) );
+    outp( CRTC_INDEX, LOW_ADDRESS );
+    outp( CRTC_DATA, (unsigned char)(scrollChar & 0xFF) );
+
 }
 
 // Application entrypoint
@@ -126,7 +184,20 @@ int main()
     cursorOff();
     fillScreen();
     
-    while(!kbhit()){ // Main loop
+    MD_print(0,0, vdptext, vdptextLen);
+
+    MUSIC_start();
+
+    while(1){ // Main loop
+
+        if(kbhit()) lastChar = getch();
+        if(lastChar == 0x20){ // space
+            toggleVideo();
+            lastChar = 0;
+        } 
+        if(lastChar == 0x1B){ // escape
+            break;
+        }
 
         while(!(inp(INPUT_STATUS) & 0x08)); // Wait for Vretrace start
         
@@ -135,9 +206,31 @@ int main()
         if(frame % 5 == 0) cycleColours();
         if(frame == 70) frame = 0;
 
-        // Play some PSG here.
+        // and do smooth scrolling
+        doScrollingRT();
 
         while(inp(INPUT_STATUS) & 0x08); // Wait for retrace end
+
+        if(frame % 2 == 0){ // read controllers every other frame because >60Hz breaks 6button pads apparently, and we could be at 70Hz
+            controllerState = MD_readController();
+            
+            switch(controllerState){
+                case 0x01: // up
+                    scrollLine--;
+                    break;
+                case 0x02: // down
+                    scrollLine++;
+                    break;
+                case 0x40: // a
+                    MD_setVDP();
+                    break;
+                case 0x10: // b
+                    MD_setVGA();
+                    break;
+            }
+
+            doScrolling();
+        }
 
         // While screen is drawing, read controller, talk to Z80/VDP/etc perhaps
 
@@ -145,6 +238,7 @@ int main()
     
     is80col ? go80col() : go40col();
 
+    MUSIC_stop();
     MUSIC_free();
     
     cursorOn();

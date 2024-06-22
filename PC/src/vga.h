@@ -29,6 +29,7 @@
 #define MEMORY_MODE 0x04
 
 /* CRT controller registers */
+#define PRESET_ROW_SCAN 0x08
 #define MAXIMUM_SCAN_LINE 0x09
 #define HIGH_ADDRESS 0x0C
 #define LOW_ADDRESS 0x0D
