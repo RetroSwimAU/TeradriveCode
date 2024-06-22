@@ -139,7 +139,7 @@ void MD_startVDP(){
         MD_memoryWriteW(VDP_CONTROL, 0x8000 | i << 8 | VDP_SETUP[i]);
     }
 
-    // Setup palette
+    // Setup palette - working OK I think!
     MD_memoryWriteL(VDP_CONTROL, VDP_COLOUR_0_REG);
     MD_memoryWriteW(VDP_DATA, VDP_COLOUR_0);
     MD_memoryWriteL(VDP_CONTROL, VDP_COLOUR_1_REG);
@@ -166,11 +166,13 @@ void MD_startVDP(){
         MD_memoryWriteB(VDP_DATA, thisVDPByte);
     }
 
+    // This and the VRAM writes below seem to be good though.
+    // It produces garbage, but it's garbage that follows the pattern of Hello World! haha
     MD_memoryWriteW(VDP_CONTROL, VDP_ENABLE_SCREEN);
 
     for(i = 0; i < 12; i++){
         j = 0xC000 + (i * 2);
-        thisVDPLong = 0x40000000 | ((j & 0x3FFF) << 16) | ((j & 0xC000) >> 14);
+        thisVDPLong = VDP_VRAM | ((j & 0x3FFF) << 16) | ((j & 0xC000) >> 14);
         MD_memoryWriteL(VDP_CONTROL, thisVDPLong);
         MD_memoryWriteW(VDP_DATA, 0x0000 | (unsigned int)(helloWorld[i] - 32) );
     }
