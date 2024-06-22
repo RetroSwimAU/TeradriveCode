@@ -39,20 +39,31 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
     * The playback of the Master System music is, well, barbaric. The file is read a byte at a time, sending the PSG commands as it finds them, ignoring any wait/delay commands, as fast as it can. The fact I update the file position on the screen just happens to make it play sorta-kinda the right speed.
     
 
-## MD PSG playback from PC side
-![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/87bc9323-5314-4551-88e6-4b3b46e08b6c)
+## Access MD resources from PC side
+![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/e39d36f9-ca98-44e3-af8f-1b0ad07a6c7e)
 
-As long as you have OpenWatcom installed and the requisite environments set, should just need to clone the repo and `wmake` in the PC directory.
+
+Run `pwsh build.ps1` in the project directory. This is from [https://github.com/pleft/SEGA_VSCode_Template](a generous githubber). Thank you!
 
 ### Issues
 * ~~Sometimes hangs on `outp(0x1164, 0x81);`. I think the M68k isn't coming out of reset. I'm not sure why.~~
   * This was related to the PicoMEM I have in my TeraDrive. Moved its boot ROM to D000 and problem solved.
-* The VGM playback is just reading the file as fast as it can, one byte at a time. That ain't it chief. It was just a way to get it going with my non-existent C and DOS programming knowledge.
-  * Now uses `fread()` which is significantly faster than `_dos_read()`, so song now plays at recognisable pace! Still not a nice constant pace, but 'good enough' to prove the concept.
-* The VGM playback is tailored to this specific VGM file, and its version of the VGM header. To use a different one, replace `test.vgm`.
-  * If your VGM file is compressed (.vgm.gz or .vgz extension), `gunzip` it first.
-  * If your VGM file's header is not 0x40 bytes long, I can't vouch for the results.
-  * If your VGM file uses commands other than 0x4f 0x50 0x61-0x63 0x66, I can't vouch for the results.
+* ~~The VGM playback is just reading the file as fast as it can, one byte at a time. That ain't it chief. It was just a way to get it going with my non-existent C and DOS programming knowledge.~~
+  * ~~Now uses `fread()` which is significantly faster than `_dos_read()`, so song now plays at recognisable pace! Still not a nice constant pace, but 'good enough' to prove the concept.~~
+  * Now uses interrupt driven playback, however since it's just a 10MHz 286, I had to make some compromises to make it play fast AND work with all the other stuff going on. Playback is 99% awesome, just a few minor spots it has a sad.
+* ~~The VGM playback is tailored to this specific VGM file, and its version of the VGM header. To use a different one, replace `test.vgm`.~~
+  * ~~If your VGM file is compressed (.vgm.gz or .vgz extension), `gunzip` it first.~~
+  * ~~If your VGM file's header is not 0x40 bytes long, I can't vouch for the results.~~
+  * ~~If your VGM file uses commands other than 0x4f 0x50 0x61-0x63 0x66, I can't vouch for the results.~~
+  * Don't change the VGM file ok? :D
+* Shows something nice on the PC side now!! There's more to the message than you see at first! ;)
+* Has controls!! Up/Down on the Dpad to scroll, A/B to switch outputs.
+* Has keyboard! Space to toggle outputs. Escape to quit.
+* Shows stuff on the MD VDP! A static message but hey!
+* Scrolling has minor issues:
+  * In "Video" mode, it jumps vertically every 16 pixels, I think I need to calculate new values for manipulating the line compare register.
+  * In "RGB" mode it flickers very occasionally, I think if a music interrupt happens near after V retrace finishes but before address register changes.
+  * Still lookg pretty nice IMO, especially for a first try, and with so many variables.
  
 ### Resources
 * Info on the 'startup sequence' comes from this forum post from 2018. I believe this is based on reverse-engineering of Puzzle Construction Kit.
