@@ -227,7 +227,7 @@ int main()
 
     // Static text
     //           "1234567890123456789012345678901234567890"
-    VDP_drawText("TeraDrive Demo 0.4 - RetroSwim 2024", 0, 0);
+    VDP_drawText("TeraDrive Demo 0.5 - RetroSwim 2024", 0, 0);
     VDP_drawText("Frame:", 0, 1);
     VDP_drawText("Time:", 0, 2);
     VDP_drawText("PC BIOS F0000-F0050:", 0, 3);
