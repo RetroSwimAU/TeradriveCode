@@ -43,7 +43,7 @@ This all comes from https://gendev.spritesmind.net/forum/viewtopic.php?t=2887 ..
 ![image](https://github.com/RetroSwimAU/TeradriveCode/assets/45222648/e39d36f9-ca98-44e3-af8f-1b0ad07a6c7e)
 
 
-Run `pwsh build.ps1` in the project directory. This is from [https://github.com/pleft/SEGA_VSCode_Template](a generous githubber). Thank you!
+Run `pwsh build.ps1` in the project directory. This is from [a generous githubber](https://github.com/pleft/SEGA_VSCode_Template). Thank you!
 
 ### Issues
 * ~~Sometimes hangs on `outp(0x1164, 0x81);`. I think the M68k isn't coming out of reset. I'm not sure why.~~
